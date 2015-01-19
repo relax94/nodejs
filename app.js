@@ -5,7 +5,9 @@ io = require("socket.io").listen(server);
 mongoose = require('mongoose');
 users = {};
 
-server.listen(3000);
+server.listen(process.env.PORT || 3000, function(){
+  console.log('listening on', server.address().port);
+});;
 
 mongoose.connect('mongodb://localhost/chat', function(err){
 	if(err)
