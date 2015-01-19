@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Chat App</title>
+<style type="text/css">
+
+.chat-container
+{
+	display: none;
+}
+
+</style>
+</head>
+<body>
+<div id="auth-form">
+	<label>
+		Enter username : <input id="username" type="text" />
+	</label>
+	<button id="submitUsername">Save</button>
+</div>
+
+<div class="chat-container">
+<div id="results">
+</div>
+
+<div id="message-block">
+<input id="message" type="text" />
+<button id="send">Send</button>
+	</div>
+</div>
+<div class="users-online">
+	</div>
+
+<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+<script type="text/javascript">
+
+$(document).ready(function(){
+
+var socket = io.connect();
+
+console.log("message ",message);
+
+$("#send").click(function()
+{
+	var message = $("#message").val();
+	//alert("click");
+	socket.emit('sendMessage', message);
+	$("#message").val('');
+
+
+});
+
+
+$("#submitUsername").click(function(){
+
+	var nick = $("#username").val();
+	socket.emit('newUser', nick, function(data)
+	{
+			if(data)
+			{
+				$("#auth-form").hide();
+				$(".chat-container").show();
+			}
+			else
+			{
+				$("#auth-form").append("error nickname is already used");
+			}
+	});
+	$("#username").val('');
+});
+
+
+socket.on('newMessage', function(data){
+		$("#results").append(data.message + "<br />");
+});
+
+socket.on('loadHistory', function(docs)
+{
+	var html = "";
+    for(var i = 0; i < docs.length; i++)
+    {
+    	html += docs[i].nick + " -> " + docs[i].msg + "<br />";
+    }
+    $("#results").html(html);
+});
+
+socket.on('usernames', function(data){
+	var html = "";
+	console.log("on disconnected");
+    for(var i = 0; i < data.length; i++)
+    {
+    	html += data[i] + "<br />";
+    }
+    $(".users-online").html(html);
+    
+});
+
+});
+
+</script>
+</body>
+</html>
