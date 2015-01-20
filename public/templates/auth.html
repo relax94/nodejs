@@ -1,0 +1,26 @@
+
+
+
+<div class="panel panel-default">
+    <div class="panel-body">
+       <form class="form-horizontal">
+    <fieldset>
+        <legend>Go to Chat : </legend>
+        <div class="form-group">
+            <label for="inputEmail" class="col-lg-2 control-label">Nickname</label>
+            <div class="col-lg-10">
+                <input type="text" class="form-control" id="inputEmail"  ng-model="username" placeholder="Nickname">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-lg-10 col-lg-offset-2">
+                <button type="submit" class="btn btn-primary" ng-click="connect()">Submit</button>
+            </div>
+        </div>
+    </fieldset>
+</form>
+    </div>
+    <div class="panel-footer">
+    	<span class="label label-danger">{{errorText}}</span>
+    </div>
+</div>

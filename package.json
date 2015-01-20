@@ -5,6 +5,7 @@
 	"dependencies":{
 		"socket.io":"1.3.2",
 		"express":"4.11.0",
-		"mongoose":"3.8.21"
+		"mongoose":"3.8.21",
+		"angular-timeago":"0.1.7"
 	}
 }
