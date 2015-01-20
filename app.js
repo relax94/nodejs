@@ -5,8 +5,8 @@ io = require("socket.io").listen(server);
 mongoose = require('mongoose');
 users = {};
 app.use(express.static(__dirname + '/public'));
-app.set('domain', '192.168.0.104');
-server.listen(3000);
+app.set('domain', 'http://ndz.azurewebsites.net/');
+server.listen(80);
 var bodyParser = require('body-parser');
 var multer = require('multer'); 
 var fs = require('fs');
@@ -43,7 +43,7 @@ var client = new Dropbox.Client({
 });*/
 
 
-mongoose.connect('mongodb://localhost/chat', function(err){
+mongoose.connect('mongodb://relax94:transcend123@oceanic.mongohq.com:10081/NewsDB', function(err){
 	if(err)
 		console.log(err);
 	else
