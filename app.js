@@ -4,10 +4,8 @@ server = require('http').createServer(app);
 io = require("socket.io").listen(server);
 mongoose = require('mongoose');
 users = {};
-
-server.listen(process.env.PORT || 3000, function(){
-  console.log('listening on', server.address().port);
-});;
+app.use(express.static(__dirname + '/public'));
+server.listen(3000);
 
 mongoose.connect('mongodb://localhost/chat', function(err){
 	if(err)

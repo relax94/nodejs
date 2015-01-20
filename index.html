@@ -10,8 +10,42 @@
 }
 
 </style>
+<link rel="stylesheet" type="text/css" href="/css/material.css" />
+<link rel="stylesheet" type="text/css" href="/css/ripples.css" />
+<link rel="stylesheet" type="text/css" href="/css/bootstrap.css" />
+<link rel="stylesheet" type="text/css" href="/css/site.css" />
 </head>
 <body>
+	<div class="navbar navbar-default">
+    <div class="navbar-header">
+        <a class="navbar-brand" href="/chat">NodeJS</a>
+    </div>
+    <div class="navbar-collapse collapse navbar-responsive-collapse">
+        <!--<ul class="nav navbar-nav">
+            <li class="active"><a href="javascript:void(0)">Active</a></li>
+            <li><a href="javascript:void(0)">Link</a></li>
+            <li class="dropdown">
+                <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                    <li><a href="javascript:void(0)">Action</a></li>
+                    <li><a href="javascript:void(0)">Another action</a></li>
+                    <li><a href="javascript:void(0)">Something else here</a></li>
+                    <li class="divider"></li>
+                    <li class="dropdown-header">Dropdown header</li>
+                    <li><a href="javascript:void(0)">Separated link</a></li>
+                    <li><a href="javascript:void(0)">One more separated link</a></li>
+                </ul>
+            </li>
+        </ul>
+        <form class="navbar-form navbar-left">
+            <input type="text" class="form-control col-lg-8" placeholder="Search">
+        </form>-->
+        <ul class="nav navbar-nav navbar-right">
+            <li><a id="currUser" href="">Anonym</a></li>
+        </ul>
+    </div>
+</div>
+<div id="main-container">
 <div id="auth-form">
 	<label>
 		Enter username : <input id="username" type="text" />
@@ -20,20 +54,42 @@
 </div>
 
 <div class="chat-container">
-<div id="results">
+	<div class="row"> 
+	<div class="col-lg-4">
+		<div id="recMess" class="list-group">  
+		</div>
+	</div>
+
+
+	
+		<div id="message-block" class="col-lg-3">
+		                                            <div class="form-control-wrapper">
+		                                            	<textarea id="message" class="form-control empty" rows="3" id="textArea"></textarea>
+		                                            	<span class="material-input"></span>
+		                                            </div>
+		                                            <span class="help-block">Type your message.</span>
+		                                            <div class="form-control-wrapper">
+		                                            		<button id="send" class="btn btn-primary form-control">Send</button>
+		                                            </div>
+		</div>
+	
+	
+		<div class="col-lg-5">
+		<div id="usersIn" class="list-group">  
+		</div>
+	</div>
 </div>
 
-<div id="message-block">
-<input id="message" type="text" />
-<button id="send">Send</button>
-	</div>
+
 </div>
 <div class="users-online">
 	</div>
-
+</div>
+<audio id="inMessage" src="http://zvuki-mp3.com/download/vk-1_zvuki-mp3.com.mp3" />
 <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
 <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+<script type="text/javascript" src="/js/material.js"></script>
 <script type="text/javascript">
 
 $(document).ready(function(){
@@ -56,10 +112,13 @@ $("#send").click(function()
 $("#submitUsername").click(function(){
 
 	var nick = $("#username").val();
+	window.nick = nick;
 	socket.emit('newUser', nick, function(data)
 	{
+		console.log(data);
 			if(data)
 			{
+				$("#currUser").text(nick);
 				$("#auth-form").hide();
 				$(".chat-container").show();
 			}
@@ -73,7 +132,16 @@ $("#submitUsername").click(function(){
 
 
 socket.on('newMessage', function(data){
-		$("#results").append(data.message + "<br />");
+	var item = '<div class="list-group-item"><div class="row-action-primary"><i class="mdi-file-folder"></i></div><div class="row-content">'+
+            '<div class="least-content">15m</div>'+
+            '<h4 class="list-group-item-heading">'+data.nick+'</h4>'+
+            '<p class="list-group-item-text">'+data.message+'</p>'+
+        '</div>'+
+   '</div>'+
+    '<div class="list-group-separator"></div>';
+		$("#recMess").append(item);
+		if(window.nick != data.nick)
+			document.getElementById('inMessage').play();
 });
 
 socket.on('loadHistory', function(docs)
@@ -86,14 +154,24 @@ socket.on('loadHistory', function(docs)
     $("#results").html(html);
 });
 
+
+function getUserInItem(username)
+{
+		return '<div class="list-group-item"><div class="row-action-primary"><i class="mdi-file-folder"></i></div><div class="row-content">'+
+            '<h4 class="list-group-item-heading">'+username+'</h4>'+
+        '</div>'+
+   '</div>'+
+    '<div class="list-group-separator"></div>';
+}
+
 socket.on('usernames', function(data){
 	var html = "";
 	console.log("on disconnected");
     for(var i = 0; i < data.length; i++)
     {
-    	html += data[i] + "<br />";
+    	html += getUserInItem(data[i]);
     }
-    $(".users-online").html(html);
+    $("#usersIn").html(html);
     
 });
 
