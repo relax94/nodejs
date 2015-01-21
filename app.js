@@ -6,7 +6,7 @@ mongoose = require('mongoose');
 users = {};
 app.use(express.static(__dirname + '/public'));
 //app.set('domain', 'http:/192.168.0.104/');
-server.listen(81);
+server.listen(80);
 var bodyParser = require('body-parser');
 var multer = require('multer'); 
 var fs = require('fs');
