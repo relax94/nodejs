@@ -42,7 +42,7 @@ var client = new Dropbox.Client({
   console.log(stat);
 });*/
 
-
+//Cloud MongoDB : mongodb://relax94:transcend123@oceanic.mongohq.com:10081/NewsDB
 mongoose.connect('mongodb://relax94:transcend123@oceanic.mongohq.com:10081/NewsDB', function(err){
 	if(err)
 		console.log(err);
@@ -56,7 +56,7 @@ var chatSchema = mongoose.Schema({
 	nick: String,
 	msg: String,
 	created: {type: Date, default: Date.now},
-	object : {name:'', path:''}
+	object : []
 });
 
 var Chat = mongoose.model('Message',chatSchema);
@@ -68,28 +68,36 @@ app.get('/chat', function(req,res){
 
 
 
+function uploadFile(fileMeta)
+{
+			fs.readFile(fileMeta.path, function(err, data) {
+				if (err) throw err;
+				client.writeFile(DROPBOX_PATH + fileMeta.originalname, data, function(error, stat) {
+					if (error) {
+   					 return showError(error);  // Something went wrong.
+   					}
+
+
+   				});
+			});
+}
+
 
 
 app.post('/fileupload', function(req, res) {
 	console.log("app post");
-	var fileMeta = req.files['uploadedFile'];
-
-	if (fileMeta) {
-		fs.readFile(fileMeta.path, function(err, data) {
-			if (err) throw err;
-
-			client.writeFile(DROPBOX_PATH + fileMeta.originalname, data, function(error, stat) {
-				if (error) {
-   					 return showError(error);  // Something went wrong.
-					}
-
-			console.log(stat);
-			res.redirect('/');
-			});
-					});
-				} else {
-					res.redirect('/');
-				}
+	var files = req.files['uploadedFile'];
+	if(files)
+	{
+		for (var i in files) {
+			console.log(files[i].originalname);
+			uploadFile(files[i]);
+		}
+		res.send("Files saved!");
+	}
+	else {
+				res.send("Err!");
+		}	
 			});
 
 
@@ -128,7 +136,7 @@ io.sockets.on('connection', function(socket){
 		var message = data.msg.trim();
 		var first = message.indexOf('[');
 		var last = message.indexOf(']');
-		var newMessage = new Chat({msg: data.msg, nick: socket.nickname, object : {name:data.objPath, path:data.objName}});
+		var newMessage = new Chat({msg: data.msg, nick: socket.nickname, object : data.objects});
 		if(first != -1 && last != -1)
 		{
 

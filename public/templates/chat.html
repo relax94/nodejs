@@ -2,69 +2,83 @@
 <div class="row"> 
 	<div class="col-lg-5">
 		<div class="panel panel-default">
-    <div class="panel-heading">Chat Messages : </div>
-    <div class="panel-body">
-		<div class="list-group">  
-			<div class="list-group-item" ng-repeat="message in messages">
-				<div class="row-action-primary">
-					<i class="">{{message.nick[0].toUpperCase()}}</i>
-				</div>
-				<div class="row-content">
-					<div class="least-content">{{message.created | date}}</div>
-					<h4 class="list-group-item-heading">{{message.nick}}</h4>
-					<p class="list-group-item-text">{{message.msg}}</p>
-				</br>
-					<div ng-show="message.object.path" class="list-group-item-text">
-						<i class="mdi-editor-attach-file"></i>
-						<a href="{{message.object.name}}" target="_blank">{{message.object.path}}</a>
+			<div class="panel-heading">Chat Messages : </div>
+			<div class="panel-body">
+				<div class="list-group">  
+					<div class="list-group-item" ng-repeat="message in messages">
+						<div class="row-action-primary">
+							<i class="">{{message.nick[0].toUpperCase()}}</i>
+						</div>
+						<div class="row-content">
+							<div class="least-content">{{message.created | date}}</div>
+							<h4 class="list-group-item-heading">{{message.nick}}</h4>
+							<p class="list-group-item-text">{{message.msg}}</p>
+						</br>
+						<div ng-show="message.object" class="list-group-item-text">
+							<ul class="files-list"> 
+								<li ng-repeat="file in message.object">
+									<!--<img 
+									ng-show="file.name.match(/(.png|.jpg|.gif|.svg)$/) != -1"
+									src="{{file.path}}"
+									class="message-img"
+									/>-->
+									<i class="mdi-editor-attach-file"></i>
+									<a href="{{file.path}}" target="_blank">{{file.name}}</a>
+								</li>
+							</ul>
+						</div>
 					</div>
+					<div class="list-group-separator"></div>
 				</div>
-				<div class="list-group-separator"></div>
 			</div>
 		</div>
-		   </div>
-</div>
 	</div>
-
-
-
-	<div id="message-block" class="col-lg-3">
-				<div class="panel panel-default">
-    <div class="panel-heading">Input actions : </div>
-    <div class="panel-body">
-		<div class="form-control-wrapper">
-			<textarea id="message" class="form-control empty" rows="3" id="textArea" ng-model="messageText"></textarea>
-			<span class="material-input"></span>
-		</div>
-		<span class="help-block">Type your message.</span>
-		<div class="form-control-wrapper">
-			<button id="send" ng-click="send()" class="btn btn-primary form-control">Send</button>
-			<span class="label label-warning">{{errorMessageInput}}</span>
-			<a href="{{dropboxPath}}">{{dropboxName}}</a>
-		</div>
-		<div class="form-control">
-		<input type="file" ng-model-instant id="fileToUpload" onchange="angular.element(this).scope().setFiles(this)" />
-			</div>
-			</div>
-			</div>
-	</div>
-
-
-	<div class="col-lg-4">
-		<div class="panel panel-default">
-    <div class="panel-heading">Active users : </div>
-    <div class="panel-body">
-		<div  class="list-group">  
-			<div class="list-group-item" ng-repeat="user in avaibleUsers">
-				<div class="row-action-primary" ng-click="setUser(user)">
-					<i>{{user[0].toUpperCase()}}</i>
-				</div>
-				<div class="row-content">
-					<h4 class="list-group-item-heading">{{user}}</h4>
-				</div>
-				<div class="list-group-separator"></div>
-			</div>
 </div>
+<div id="message-block" class="col-lg-3">
+	<div class="panel panel-default">
+		<div class="panel-heading">Input actions : </div>
+		<div class="panel-body">
+			<div class="form-control-wrapper">
+				<textarea id="message" class="form-control empty" rows="3" id="textArea" ng-model="messageText"></textarea>
+				<span class="material-input"></span>
+			</div>
+			<span class="help-block">Type your message.</span>
+			<div class="form-control-wrapper">
+				<button id="send" ng-click="send()" class="btn btn-primary form-control">Send</button>
+				<span class="label label-warning">{{errorMessageInput}}</span>
+				<div>
+					<ul class="files-list">
+						<li ng-repeat="file in filesStorage"> 
+
+							<i class="mdi-editor-attach-file"></i>
+							<a href="{{file.path}}">{{file.name}}</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="form-control">
+				<input type="file" multiple  ng-model-instant id="fileToUpload" onchange="angular.element(this).scope().setFiles(this)" />
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="col-lg-4">
+	<div class="panel panel-default">
+		<div class="panel-heading">Active users : </div>
+		<div class="panel-body">
+			<div  class="list-group">  
+				<div class="list-group-item" ng-repeat="user in avaibleUsers">
+					<div class="row-action-primary" ng-click="setUser(user)">
+						<i>{{user[0].toUpperCase()}}</i>
+					</div>
+					<div class="row-content">
+						<h4 class="list-group-item-heading">{{user}}</h4>
+					</div>
+					<div class="list-group-separator"></div>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>
@@ -72,4 +86,3 @@
 <div class="users-online">
 </div>
 
- 

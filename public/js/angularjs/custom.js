@@ -98,12 +98,16 @@ app.controller('AuthCtrl', function($scope,$cookies, socket)
 
 app.controller('ChatCtrl', function($scope,$routeParams,$cookies, socket)
 {
-	console.log(location);
-var DROPBOX_LINK = 'https://dl.dropboxusercontent.com/u/60906355/nodefiles/';
+	
+	var DROPBOX_LINK = 'https://dl.dropboxusercontent.com/u/60906355/nodefiles/';
 	$scope.avaibleUsers = [];	
 	$scope.messages = {};
 	$scope.errorMessageInput = '';
 	$scope.messageText = '';
+	$scope.loaderText = 0;
+	var files = [];
+	$scope.filesStorage = [];
+	$scope.recipients = [];
 
 	$scope.$on('avaibleUsers', function(e,args)
 	{
@@ -128,8 +132,7 @@ var DROPBOX_LINK = 'https://dl.dropboxusercontent.com/u/60906355/nodefiles/';
 		var data = 
 		{
 			msg : $scope.messageText,
-			objPath : $scope.dropboxPath || '',
-			objName : $scope.dropboxName || ''
+			objects : files
 		};
 
 		if($scope.messageText != '' || $scope.dropboxPath != '')
@@ -137,8 +140,6 @@ var DROPBOX_LINK = 'https://dl.dropboxusercontent.com/u/60906355/nodefiles/';
 		else
 			$scope.errorMessageInput = 'Message text isRequired';
 		$scope.messageText = '';
-		$scope.dropboxPath = '';
-	    $scope.dropboxName = '';
 	};
 
 
@@ -169,27 +170,48 @@ var DROPBOX_LINK = 'https://dl.dropboxusercontent.com/u/60906355/nodefiles/';
 	$scope.setUser = function(user)
 	{
 		$scope.messageText = "["+user+"]";
+		$scope.recipients.push(user);
 	}
 
    $scope.setFiles = function(element) {
     $scope.$apply(function(scope) {
       // Turn the FileList object into an Array
         var fd = new FormData()
-       // for (var i in element.files) {
-            fd.append("uploadedFile", element.files[0]);
+        for (var i in element.files) {
+            if(element.files[i].type) 
+            {
+            	fd.append("uploadedFile", element.files[i]);
+              files.push({path:DROPBOX_LINK + element.files[i].name, name: element.files[i].name });
+           }
+		}
 
         var xhr = new XMLHttpRequest()
-        //r.upload.addEventListener("progress", uploadProgress, false)
+       // xhr.upload.addEventListener("progress", uploadProgress, false)
         //r.addEventListener("load", uploadComplete, false)
        //hr.addEventListener("error", uploadFailed, false)
        //hr.addEventListener("abort", uploadCanceled, false)
         xhr.open("POST", "/fileupload")
+		xhr.addEventListener("load", transferComplete, false);
+		xhr.addEventListener("error", transferFailed, false);
+		xhr.addEventListener("abort", transferCanceled, false);
+
+
+
+xhr.open("POST", "/fileupload")
+
+function transferComplete(evt) {
+  alertify.success("files succesfully upload");
+}
+
+function transferFailed(evt) {
+  alertify.error("files failed uploaded");
+}
+
+function transferCanceled(evt) {
+  alert("The transfer has been canceled by the user.");
+}
        // scope.progressVisible = true
         xhr.send(fd);
-
-		$scope.dropboxPath = DROPBOX_LINK + element.files[0].name;
-		$scope.dropboxName = element.files[0].name;
-
       });
     };
 });
