@@ -6,7 +6,10 @@ mongoose = require('mongoose');
 users = {};
 app.use(express.static(__dirname + '/public'));
 //app.set('domain', 'http:/192.168.0.104/');
-server.listen(80);
+server.listen(process.env.PORT || 81, function(){
+  console.log('listening on', server.address().port);
+});
+
 var bodyParser = require('body-parser');
 var multer = require('multer'); 
 var fs = require('fs');
