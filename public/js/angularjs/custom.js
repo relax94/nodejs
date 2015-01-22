@@ -98,6 +98,14 @@ app.controller('AuthCtrl', function($scope,$cookies, socket)
 
 app.controller('ChatCtrl', function($scope,$routeParams,$cookies, socket)
 {
+
+	$(".slider").noUiSlider({
+	start: [20],
+	range: {
+		'min': 0,
+		'max': 100
+	}
+});
 	
 	var DROPBOX_LINK = 'https://dl.dropboxusercontent.com/u/60906355/nodefiles/';
 	$scope.avaibleUsers = [];	
@@ -111,6 +119,7 @@ app.controller('ChatCtrl', function($scope,$routeParams,$cookies, socket)
 
 	$scope.$on('avaibleUsers', function(e,args)
 	{
+		console.log(args);
 			$scope.avaibleUsers = args;
 			$scope.$apply();
 	});
@@ -118,6 +127,7 @@ app.controller('ChatCtrl', function($scope,$routeParams,$cookies, socket)
 
 	$scope.$on('newMessage', function(e,args)
 	{
+		console.log('newMessage',args);
 			$scope.messages.splice(0,0,args);
 			$scope.$apply();
 	});
@@ -132,6 +142,7 @@ app.controller('ChatCtrl', function($scope,$routeParams,$cookies, socket)
 		var data = 
 		{
 			msg : $scope.messageText,
+			recipients: $scope.recipients,
 			objects : files
 		};
 
@@ -169,9 +180,17 @@ app.controller('ChatCtrl', function($scope,$routeParams,$cookies, socket)
 
 	$scope.setUser = function(user)
 	{
-		$scope.messageText = "["+user+"]";
-		$scope.recipients.push(user);
+		var temp = $scope.recipients;
+		var index = temp.indexOf(user.name);
+		if(index != -1)
+		{
+			$scope.recipients.splice(index,1);
+		}
+		else
+		$scope.recipients.push(user.name);
 	}
+
+
 
    $scope.setFiles = function(element) {
     $scope.$apply(function(scope) {
@@ -197,21 +216,21 @@ app.controller('ChatCtrl', function($scope,$routeParams,$cookies, socket)
 
 
 
-xhr.open("POST", "/fileupload")
+	xhr.open("POST", "/fileupload")
 
-function transferComplete(evt) {
-  alertify.success("files succesfully upload");
-}
+	function transferComplete(evt) {
+	  alertify.success("files succesfully upload");
+	}
 
-function transferFailed(evt) {
-  alertify.error("files failed uploaded");
-}
+	function transferFailed(evt) {
+	  alertify.error("files failed uploaded");
+	}
 
-function transferCanceled(evt) {
-  alert("The transfer has been canceled by the user.");
-}
-       // scope.progressVisible = true
-        xhr.send(fd);
-      });
-    };
-});
+	function transferCanceled(evt) {
+	  alert("The transfer has been canceled by the user.");
+	}
+	       // scope.progressVisible = true
+	        xhr.send(fd);
+	      });
+	    };
+	});

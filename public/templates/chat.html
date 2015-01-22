@@ -2,12 +2,15 @@
 <div class="row"> 
 	<div class="col-lg-5">
 		<div class="panel panel-default">
-			<div class="panel-heading">Chat Messages : </div>
+			<div class="panel-heading">Chat Messages : 
+<div class="slider shor"></div>
+			</div>
 			<div class="panel-body">
 				<div class="list-group">  
 					<div class="list-group-item" ng-repeat="message in messages">
 						<div class="row-action-primary">
-							<i class="">{{message.nick[0].toUpperCase()}}</i>
+
+							<i ng-class="message.av">{{message.nick[0].toUpperCase()}}</i>
 						</div>
 						<div class="row-content">
 							<div class="least-content">{{message.created | date}}</div>
@@ -42,6 +45,13 @@
 				<textarea id="message" class="form-control empty" rows="3" id="textArea" ng-model="messageText"></textarea>
 				<span class="material-input"></span>
 			</div>
+			<div>
+				<ul class="recipients-lst">
+					<li class="recipient-item" ng-repeat="rec in recipients">
+						<i class="mdi-action-account-circle"></i>{{rec}}
+					</li>
+				</ul>
+			</div>
 			<span class="help-block">Type your message.</span>
 			<div class="form-control-wrapper">
 				<button id="send" ng-click="send()" class="btn btn-primary form-control">Send</button>
@@ -71,10 +81,10 @@
 			<div  class="list-group">  
 				<div class="list-group-item" ng-repeat="user in avaibleUsers">
 					<div class="row-action-primary" ng-click="setUser(user)">
-						<i>{{user[0].toUpperCase()}}</i>
+						<i ng-class="user.avcolor" class="seccur">{{user.name[0].toUpperCase()}}</i>
 					</div>
 					<div class="row-content">
-						<h4 class="list-group-item-heading">{{user}}</h4>
+						<h4 class="list-group-item-heading">{{user.name}}</h4>
 					</div>
 					<div class="list-group-separator"></div>
 				</div>

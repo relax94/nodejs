@@ -26,27 +26,8 @@ var client = new Dropbox.Client({
 	token : "XQ8I0hR-FMUAAAAAAAAerp49egTXbNQtRn1ulbIPIf-RqQ_2VQuG5bxffdlbbb38"
 });
 
- //client.authDriver(new Dropbox.AuthDriver.NodeServer(3000));
-
-   /* client.authenticate(function(error, client) {
-      if (error) {
-        console.log("Some shit happened trying to authenticate with dropbox");
-        console.log(error);
-        return;
-      }
-  });*/
-
-
-/*client.writeFile(DROPBOX_PATH + "hello_world.txt", "Hello, world!\n", function(error, stat) {
-  if (error) {
-    return showError(error);  // Something went wrong.
-  }
-
-  console.log(stat);
-});*/
-
 //Cloud MongoDB : mongodb://relax94:transcend123@oceanic.mongohq.com:10081/NewsDB
-mongoose.connect('mongodb://relax94:transcend123@oceanic.mongohq.com:10081/NewsDB', function(err){
+mongoose.connect('mongodb://localhost/chat', function(err){
 	if(err)
 		console.log(err);
 	else
@@ -58,6 +39,7 @@ mongoose.connect('mongodb://relax94:transcend123@oceanic.mongohq.com:10081/NewsD
 var chatSchema = mongoose.Schema({
 	nick: String,
 	msg: String,
+	av:String,
 	created: {type: Date, default: Date.now},
 	object : []
 });
@@ -90,18 +72,44 @@ function uploadFile(fileMeta)
 app.post('/fileupload', function(req, res) {
 	console.log("app post");
 	var files = req.files['uploadedFile'];
+	console.log("files ",files);
 	if(files)
 	{
+		if(files.length > 1)
+		{
 		for (var i in files) {
 			console.log(files[i].originalname);
 			uploadFile(files[i]);
 		}
-		res.send("Files saved!");
-	}
+		}
+		else
+		{
+			uploadFile(files);
+		}
+			res.send("Files saved!");
+		}
 	else {
 				res.send("Err!");
 		}	
 			});
+
+
+// использование Math.round() даст неравномерное распределение!
+function getRandomColor()
+{
+	var colors = {
+	0 : 'bg-red-300',
+	1 : 'bg-pink-300',
+	2 : 'bg-purple-300',
+	3 : 'bg-indigo-300',
+	4 : 'bg-blue-300',
+	5 : 'bg-cyan-300',
+	6 : 'bg-teal-300'
+};
+	var min = 0;
+	var max = 6;
+  return colors[Math.floor(Math.random() * (max - min + 1)) + min];
+}
 
 
 
@@ -109,10 +117,16 @@ app.post('/fileupload', function(req, res) {
 
 function updateNicknames()
 {
-	io.sockets.emit('usernames', Object.keys(users));
+	var result = [];
+	Object.keys(users).forEach(function(element, index, array)
+	{
+		result.push({name:element, avcolor:users[element].avcolor})
+	});
+
+	io.sockets.emit('usernames', result);
 }
 
-console.log("server socket");
+
 io.sockets.on('connection', function(socket){
 
 	var dbQuery = Chat.find({});
@@ -135,17 +149,16 @@ io.sockets.on('connection', function(socket){
 
 	socket.on('sendMessage', function(data)
 	{
-		console.log(data);
-		var message = data.msg.trim();
-		var first = message.indexOf('[');
-		var last = message.indexOf(']');
-		var newMessage = new Chat({msg: data.msg, nick: socket.nickname, object : data.objects});
-		if(first != -1 && last != -1)
-		{
 
-			var recipient = message.substr(first+1,(last-first-1));
-			console.log(recipient);
-			users[recipient].emit('newMessage', newMessage);
+
+		var newMessage = new Chat({msg: data.msg, nick: socket.nickname, object : data.objects, av:socket.avcolor});
+		if(data.recipients.length >= 1)
+		{
+			data.recipients.forEach(function(element, index, array)
+			{
+				users[element].emit('newMessage', newMessage);
+			});
+			
 		}
 		else
 		{
@@ -166,6 +179,7 @@ io.sockets.on('connection', function(socket){
 		else
 		{
 			socket.nickname = data;
+			socket.avcolor = getRandomColor();
 			users[socket.nickname] = socket;
 			callback(true);
 			updateNicknames();
