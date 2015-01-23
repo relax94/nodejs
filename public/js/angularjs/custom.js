@@ -121,6 +121,23 @@ app.controller('ChatCtrl', function($scope,$routeParams,$cookies, socket)
 	{
 		console.log(args);
 			$scope.avaibleUsers = args;
+
+
+	socket.loadHistory(function(result)
+	{
+		$.map(result, function(item){
+		    for(var i = 0; i < $scope.avaibleUsers.length; i++){
+		    	if(item.nick == $scope.avaibleUsers[i].name)
+		    	{
+		        	item.av = $scope.avaibleUsers[i].avcolor;
+		        	return item;
+		        }
+		    }
+		});
+
+
+		$scope.messages = result;
+	});
 			$scope.$apply();
 	});
 
@@ -132,10 +149,7 @@ app.controller('ChatCtrl', function($scope,$routeParams,$cookies, socket)
 			$scope.$apply();
 	});
 
-	socket.loadHistory(function(result)
-	{
-		$scope.messages = result;
-	});
+
 
 	$scope.send = function()
 	{
